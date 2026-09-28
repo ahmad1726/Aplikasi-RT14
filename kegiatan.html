@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="id" class="overflow-y-scroll">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kegiatan & Agenda - RT 014 / RW 008</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body class="bg-gray-100 font-sans text-gray-800 flex flex-col min-h-screen">
+    <!-- Header -->
+    <header class="bg-emerald-700 text-white shadow-md sticky top-0 z-50">
+      <div
+        class="max-w-7xl mx-auto px-4 py-5 flex justify-between items-center"
+      >
+        <!-- Logo Transparan & Judul RT -->
+        <div class="flex items-center space-x-4">
+          <div class="flex items-center justify-center">
+            <img
+              src="logo rt.png"
+              alt="Logo RT"
+              class="w-16 h-16 object-contain drop-shadow-sm"
+              onerror="
+                this.style.display = 'none';
+                this.nextElementSibling.style.display = 'block';
+              "
+            />
+            <i
+              class="fa-solid fa-building-columns text-emerald-200 text-3xl hidden"
+            ></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold leading-tight tracking-wide">
+              RT 014 / RW 008
+            </h1>
+            <p class="text-xs text-emerald-200 font-medium">
+              Portal Informasi Kegiatan Warga
+            </p>
+          </div>
+        </div>
+
+        <!-- Menu Navigasi -->
+        <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
+          <a href="index.html" class="hover:text-emerald-200 transition"
+            >Beranda</a
+          >
+          <a href="warga.html" class="hover:text-emerald-200 transition"
+            >Data Warga</a
+          >
+          <a
+            href="kegiatan.html"
+            class="text-emerald-200 font-bold border-b-2 border-emerald-200 pb-0.5"
+            >Kegiatan</a
+          >
+          <a href="kas.html" class="hover:text-emerald-200 transition"
+            >Transparansi Kas</a
+          >
+          <a
+            href="index.html#inventaris"
+            class="hover:text-emerald-200 transition"
+            >Inventaris</a
+          >
+          <a
+            href="index.html#pengaduan"
+            class="hover:text-emerald-200 transition"
+            >Pengaduan</a
+          >
+        </nav>
+
+        <div class="flex items-center">
+          <a href="login.html">
+            <button
+              class="bg-emerald-800 hover:bg-emerald-900 px-4 py-2.5 rounded-lg text-sm font-semibold transition border border-emerald-600/50"
+            >
+              Masuk Admin
+            </button>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-1 space-y-6 w-full">
+      <!-- Top Title & Search Filter -->
+      <div
+        class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-xl border border-gray-200 shadow-sm"
+      >
+        <div>
+          <h2
+            class="text-2xl font-extrabold text-gray-800 flex items-center gap-2"
+          >
+            <i class="fa-solid fa-calendar-check text-emerald-600"></i>
+            Kegiatan & Agenda Warga
+          </h2>
+          <p class="text-xs text-gray-500 mt-1">
+            Daftar lengkap acara, gotong royong, dan dokumentasi kegiatan RT 014
+            / RW 008
+          </p>
+        </div>
+
+        <!-- Filter & Search Input -->
+        <div class="flex flex-col sm:flex-row items-center gap-2">
+          <input
+            type="text"
+            id="searchKegiatan"
+            oninput="filterKegiatan()"
+            placeholder="Cari kegiatan..."
+            class="text-sm p-2.5 border border-gray-300 rounded-lg w-full sm:w-60 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+          />
+          <select
+            id="filterKategori"
+            onchange="filterKegiatan()"
+            class="text-sm p-2.5 border border-gray-300 rounded-lg bg-white w-full sm:w-auto focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+          >
+            <option value="">Semua Kategori</option>
+            <option value="Gotong Royong">Gotong Royong</option>
+            <option value="Rapat">Rapat / Musyawarah</option>
+            <option value="Olahraga">Olahraga & Senam</option>
+            <option value="Keagamaan">Keagamaan</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Grid Cards Kegiatan -->
+      <section>
+        <div
+          id="containerKegiatanFull"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          <div class="col-span-full text-center py-12 text-gray-400">
+            <i
+              class="fa-solid fa-spinner fa-spin text-3xl mb-3 block text-emerald-600"
+            ></i>
+            Memuat daftar kegiatan...
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer
+      class="bg-gray-800 text-white text-center py-4 text-xs border-t border-gray-700 mt-auto"
+    >
+      &copy; Portal Sistem Informasi RT 014 / RW 008. All rights reserved.
+    </footer>
+
+    <!-- JavaScript LOGIC -->
+    <script>
+      let rawKegiatanData = [];
+
+      async function fetchAllKegiatan() {
+        try {
+          const res = await fetch("api_kegiatan.php?action=get");
+          const result = await res.json();
+
+          if (result.success && result.data) {
+            rawKegiatanData = result.data;
+            renderKegiatan(rawKegiatanData);
+          } else {
+            document.getElementById("containerKegiatanFull").innerHTML = `
+              <div class="col-span-full text-center py-12 text-gray-400">Belum ada kegiatan terdaftar.</div>
+            `;
+          }
+        } catch (err) {
+          console.error("Gagal memuat kegiatan:", err);
+          document.getElementById("containerKegiatanFull").innerHTML = `
+            <div class="col-span-full text-center py-12 text-red-500">Gagal terhubung ke server database kegiatan.</div>
+          `;
+        }
+      }
+
+      function renderKegiatan(list) {
+        const container = document.getElementById("containerKegiatanFull");
+        container.innerHTML = "";
+
+        if (list.length === 0) {
+          container.innerHTML = `
+            <div class="col-span-full text-center py-12 text-gray-400 bg-white rounded-xl border border-gray-200">
+              <i class="fa-solid fa-folder-open text-4xl mb-2 text-gray-300 block"></i>
+              Tidak ada kegiatan yang cocok dengan kriteria pencarian.
+            </div>
+          `;
+          return;
+        }
+
+        list.forEach((item) => {
+          const fotoUrl = item.foto
+            ? `./uploads/${item.foto}`
+            : "https://via.placeholder.com/600x400?text=Kegiatan+RT";
+
+          const card = document.createElement("div");
+          card.className =
+            "bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col hover:shadow-lg transition duration-200";
+
+          card.innerHTML = `
+            <div class="relative h-52 bg-gray-100">
+              <img src="${fotoUrl}" alt="${item.judul}" class="w-full h-full object-cover">
+              <span class="absolute top-3 left-3 bg-emerald-600 text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase shadow-md">
+                ${item.kategori}
+              </span>
+            </div>
+            <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+              <div class="space-y-3">
+                <h3 class="font-bold text-gray-800 text-lg leading-snug">${item.judul}</h3>
+                <div class="flex flex-col gap-1 text-xs text-gray-500 bg-gray-50 p-2.5 rounded-lg border border-gray-100">
+                  <span><i class="fa-regular fa-clock text-emerald-600 w-5"></i>${formatTglKegiatan(item.tanggal_kegiatan)}</span>
+                  <span><i class="fa-solid fa-location-dot text-red-500 w-5"></i>${item.lokasi}</span>
+                </div>
+                <p class="text-xs text-gray-600 leading-relaxed whitespace-pre-line pt-2 border-t border-gray-100">${item.caption}</p>
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      }
+
+      function filterKegiatan() {
+        const keyword = document
+          .getElementById("searchKegiatan")
+          .value.toLowerCase();
+        const kategori = document.getElementById("filterKategori").value;
+
+        const filtered = rawKegiatanData.filter((item) => {
+          const matchKeyword =
+            item.judul.toLowerCase().includes(keyword) ||
+            item.caption.toLowerCase().includes(keyword) ||
+            item.lokasi.toLowerCase().includes(keyword);
+
+          const matchKategori = kategori === "" || item.kategori === kategori;
+
+          return matchKeyword && matchKategori;
+        });
+
+        renderKegiatan(filtered);
+      }
+
+      function formatTglKegiatan(str) {
+        if (!str) return "-";
+        return new Date(str).toLocaleDateString("id-ID", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", fetchAllKegiatan);
+    </script>
+  </body>
+</html>

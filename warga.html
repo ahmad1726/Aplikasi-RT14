@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="id" class="overflow-y-scroll">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Data Warga - RT 014 / RW 008</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body class="bg-gray-100 font-sans text-gray-800">
+    <header class="bg-emerald-700 text-white shadow-md sticky top-0 z-50">
+      <div
+        class="max-w-7xl mx-auto px-4 py-5 flex justify-between items-center"
+      >
+        <!-- Logo Transparan & Judul RT -->
+        <div class="flex items-center space-x-4">
+          <div class="flex items-center justify-center">
+            <img
+              src="logo rt.png"
+              alt="Logo RT"
+              class="w-16 h-16 object-contain drop-shadow-sm"
+              onerror="
+                this.style.display = 'none';
+                this.nextElementSibling.style.display = 'block';
+              "
+            />
+            <!-- Fallback Icon jika gambar gagal muat -->
+            <i
+              class="fa-solid fa-building-columns text-emerald-200 text-3xl hidden"
+            ></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold leading-tight tracking-wide">
+              RT 014 / RW 008
+            </h1>
+            <p class="text-xs text-emerald-200 font-medium">
+              Portal Sistem Informasi Lingkungan
+            </p>
+          </div>
+        </div>
+
+        <!-- Menu Navigasi Desktop -->
+        <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
+          <a href="index.html" class="hover:text-emerald-200 transition"
+            >Beranda</a
+          >
+          <a
+            href="warga.html"
+            class="text-emerald-200 font-bold border-b-2 border-emerald-200 pb-0.5"
+            >Data Warga</a
+          >
+          <a href="kegiatan.html" class="hover:text-emerald-200 transition"
+            >Kegiatan</a
+          >
+          <a href="kas.html" class="hover:text-emerald-200 transition"
+            >Transparansi Kas</a
+          >
+          <a href="index.html" class="hover:text-emerald-200 transition"
+            >Inventaris</a
+          >
+          <a href="index.html" class="hover:text-emerald-200 transition"
+            >Pengaduan</a
+          >
+        </nav>
+
+        <!-- Tombol Akses Admin -->
+        <div class="flex items-center">
+          <button
+            class="bg-emerald-800 hover:bg-emerald-900 px-4 py-2.5 rounded-lg text-sm font-semibold transition flex items-center gap-2 border border-emerald-600/50"
+          >
+            <a href="login.html" class="hover:text-emerald-200 transition">
+              <span>Masuk Admin</span>
+            </a>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8 space-y-6">
+      <!-- Header Section -->
+      <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+        <h2 class="text-2xl font-bold text-gray-800">Direktori Data Warga</h2>
+        <p class="text-sm text-gray-500">
+          Daftar Kepala Keluarga Lingkungan RT 014 / RW 008
+        </p>
+      </div>
+
+      <!-- Card Ringkasan Jumlah KK & Jiwa -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Total Kepala Keluarga -->
+        <div
+          class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between"
+        >
+          <div>
+            <p
+              class="text-xs font-semibold text-gray-500 uppercase tracking-wider"
+            >
+              Total Kepala Keluarga
+            </p>
+            <h3
+              id="statTotalKK"
+              class="text-3xl font-extrabold text-emerald-600 mt-1"
+            >
+              0
+            </h3>
+            <p class="text-xs text-gray-400 mt-0.5">
+              Kepala Keluarga terdaftar
+            </p>
+          </div>
+          <div
+            class="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl"
+          >
+            <i class="fa-solid fa-house-user"></i>
+          </div>
+        </div>
+
+        <!-- Total Jumlah Jiwa -->
+        <div
+          class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between"
+        >
+          <div>
+            <p
+              class="text-xs font-semibold text-gray-500 uppercase tracking-wider"
+            >
+              Total Jumlah Jiwa
+            </p>
+            <h3
+              id="statTotalJiwa"
+              class="text-3xl font-extrabold text-blue-600 mt-1"
+            >
+              0
+            </h3>
+            <p class="text-xs text-gray-400 mt-0.5">
+              Penduduk di lingkungan RT
+            </p>
+          </div>
+          <div
+            class="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xl"
+          >
+            <i class="fa-solid fa-users"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter & Search Bar -->
+      <div
+        class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-3 justify-between"
+      >
+        <div class="relative flex-1">
+          <i
+            class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"
+          ></i>
+          <input
+            id="inputSearchWarga"
+            oninput="filterDataWarga()"
+            type="text"
+            placeholder="Cari nama kepala keluarga / nomor rumah..."
+            class="w-full text-sm pl-9 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+          />
+        </div>
+
+        <div class="flex gap-2">
+          <select
+            id="selectStatusWarga"
+            onchange="filterDataWarga()"
+            class="text-sm p-2 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+          >
+            <option value="">Semua Status Hunian</option>
+            <option value="Tetap">Tetap</option>
+            <option value="Kontrak">Kontrak / Pengontrak</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tabel Data Warga -->
+      <div
+        class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+      >
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left text-gray-600">
+            <thead
+              class="bg-gray-50 text-gray-700 uppercase text-xs border-b border-gray-200"
+            >
+              <tr>
+                <th class="px-5 py-3">Blok / No.</th>
+                <th class="px-5 py-3">Kepala Keluarga</th>
+                <th class="px-5 py-3">Jumlah Jiwa</th>
+                <th class="px-5 py-3">Status Hunian</th>
+                <th class="px-5 py-3">Kontak WA</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyWarga" class="divide-y divide-gray-200">
+              <!-- Data dari database XAMPP dirender di sini -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Footer -->
+        <div
+          class="p-4 border-t border-gray-200 flex justify-between items-center text-xs text-gray-500"
+        >
+          <span id="infoTotalWarga">Menampilkan 0 Data</span>
+        </div>
+      </div>
+    </main>
+
+    <!-- JavaScript Data Reader -->
+    <script>
+      let wargaDataPublic = [];
+
+      async function fetchWargaPublic() {
+        try {
+          const res = await fetch("api_warga.php?action=get");
+          const result = await res.json();
+          if (result.success) {
+            wargaDataPublic = result.data;
+            updateSummaryCards(wargaDataPublic);
+            renderTablePublic(wargaDataPublic);
+          }
+        } catch (err) {
+          console.error("Gagal terhubung ke XAMPP:", err);
+        }
+      }
+
+      function updateSummaryCards(data) {
+        const totalKK = data.length;
+        // Penjumlahan total jiwa dari (jml_laki + jml_perempuan) atau jumlah_jiwa
+        const totalJiwa = data.reduce((sum, item) => {
+          const l = parseInt(item.jml_laki || item.jumlah_l || 0);
+          const p = parseInt(item.jml_perempuan || item.jumlah_p || 0);
+          const totalPerKK =
+            l + p > 0 ? l + p : parseInt(item.jumlah_jiwa || 0);
+          return sum + totalPerKK;
+        }, 0);
+
+        document.getElementById("statTotalKK").innerText = totalKK;
+        document.getElementById("statTotalJiwa").innerText = totalJiwa;
+      }
+
+      function renderTablePublic(data) {
+        const tbody = document.getElementById("tbodyWarga");
+        tbody.innerHTML = "";
+
+        document.getElementById("infoTotalWarga").innerText =
+          `Menampilkan ${data.length} Data Warga`;
+
+        if (data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="p-5 text-center text-gray-400">Tidak ada data warga ditemukan.</td></tr>`;
+          return;
+        }
+
+        data.forEach((item) => {
+          const badgeColor =
+            item.status_hunian === "Tetap"
+              ? "bg-emerald-100 text-emerald-800"
+              : "bg-amber-100 text-amber-800";
+          const cleanHp = (item.no_hp || "")
+            .replace(/^0/, "62")
+            .replace(/[^0-9]/g, "");
+
+          // Hitung total jiwa per keluarga (Laki-laki + Perempuan)
+          const jmlLaki = parseInt(item.jml_laki || item.jumlah_l || 0);
+          const jmlPerempuan = parseInt(
+            item.jml_perempuan || item.jumlah_p || 0,
+          );
+          const totalJiwa =
+            jmlLaki + jmlPerempuan > 0
+              ? jmlLaki + jmlPerempuan
+              : parseInt(item.jumlah_jiwa || 0);
+
+          const tr = document.createElement("tr");
+          tr.className = "hover:bg-gray-50 transition";
+          tr.innerHTML = `
+            <td class="px-5 py-4 font-bold text-gray-800">Blok ${item.blok} / ${item.no_rumah}</td>
+            <td class="px-5 py-4">
+              <div class="font-semibold text-gray-800">${item.nama_kk}</div>
+            </td>
+            <td class="px-5 py-4">
+              <span class="bg-blue-50 text-blue-700 text-xs px-2.5 py-1 rounded-md font-semibold">${totalJiwa} Orang (${jmlLaki}L / ${jmlPerempuan}P)</span>
+            </td>
+            <td class="px-5 py-4">
+              <span class="${badgeColor} text-xs font-bold px-2.5 py-1 rounded-full">${item.status_hunian}</span>
+            </td>
+            <td class="px-5 py-4 text-xs">
+              <a href="https://wa.me/${cleanHp}" target="_blank" class="text-emerald-600 hover:underline flex items-center gap-1">
+                <i class="fa-brands fa-whatsapp text-sm"></i>
+                <span>${item.no_hp || "-"}</span>
+              </a>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      function filterDataWarga() {
+        const search = document
+          .getElementById("inputSearchWarga")
+          .value.toLowerCase();
+        const status = document.getElementById("selectStatusWarga").value;
+
+        const filtered = wargaDataPublic.filter((item) => {
+          const matchSearch =
+            (item.nama_kk || "").toLowerCase().includes(search) ||
+            (item.blok || "").toLowerCase().includes(search) ||
+            (item.no_rumah || "").includes(search);
+          const matchStatus = status === "" || item.status_hunian === status;
+          return matchSearch && matchStatus;
+        });
+
+        renderTablePublic(filtered);
+      }
+
+      document.addEventListener("DOMContentLoaded", fetchWargaPublic);
+    </script>
+  </body>
+</html>

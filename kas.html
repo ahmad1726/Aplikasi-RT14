@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="id" class="overflow-y-scroll">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transparansi Kas - RT 014 / RW 008</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body class="bg-gray-100 font-sans text-gray-800 flex flex-col min-h-screen">
+    <!-- Header -->
+    <header class="bg-emerald-700 text-white shadow-md sticky top-0 z-50">
+      <div
+        class="max-w-7xl mx-auto px-4 py-5 flex justify-between items-center"
+      >
+        <!-- Logo Transparan & Judul RT -->
+        <div class="flex items-center space-x-4">
+          <div class="flex items-center justify-center">
+            <img
+              src="logo rt.png"
+              alt="Logo RT"
+              class="w-16 h-16 object-contain drop-shadow-sm"
+              onerror="
+                this.style.display = 'none';
+                this.nextElementSibling.style.display = 'block';
+              "
+            />
+            <i
+              class="fa-solid fa-building-columns text-emerald-200 text-3xl hidden"
+            ></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold leading-tight tracking-wide">
+              RT 014 / RW 008
+            </h1>
+            <p class="text-xs text-emerald-200 font-medium">
+              Portal Transparansi Keuangan
+            </p>
+          </div>
+        </div>
+
+        <!-- Menu Navigasi -->
+        <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
+          <a href="index.html" class="hover:text-emerald-200 transition"
+            >Beranda</a
+          >
+          <a href="warga.html" class="hover:text-emerald-200 transition"
+            >Data Warga</a
+          >
+          <a href="kegiatan.html" class="hover:text-emerald-200 transition"
+            >Kegiatan</a
+          >
+          <a
+            href="kas.html"
+            class="text-emerald-200 font-bold border-b-2 border-emerald-200 pb-0.5"
+            >Transparansi Kas</a
+          >
+          <a
+            href="index.html#inventaris"
+            class="hover:text-emerald-200 transition"
+            >Inventaris</a
+          >
+          <a
+            href="index.html#pengaduan"
+            class="hover:text-emerald-200 transition"
+            >Pengaduan</a
+          >
+        </nav>
+
+        <div class="flex items-center">
+          <a href="login.html">
+            <button
+              class="bg-emerald-800 hover:bg-emerald-900 px-4 py-2.5 rounded-lg text-sm font-semibold transition border border-emerald-600/50"
+            >
+              Masuk Admin
+            </button>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-1 space-y-8 w-full">
+      <!-- Title & Saldo Cards -->
+      <div
+        class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-xl border border-gray-200 shadow-sm"
+      >
+        <div>
+          <h2
+            class="text-2xl font-extrabold text-gray-800 flex items-center gap-2"
+          >
+            <i class="fa-solid fa-wallet text-emerald-600"></i>
+            Laporan & Transparansi Kas RT
+          </h2>
+          <p class="text-xs text-gray-500 mt-1">
+            Pencatatan real-time pemasukan dan pengeluaran kas lingkungan RT 014
+            / RW 008
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Tombol Bayar Kas -->
+          <button
+            onclick="openModalBayar()"
+            class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-2"
+          >
+            <i class="fa-solid fa-qrcode"></i> Bayar Kas
+          </button>
+
+          <!-- Tombol Cetak Laporan -->
+          <button
+            onclick="window.print()"
+            class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3.5 py-2 rounded-lg text-xs font-semibold border border-gray-300 transition flex items-center gap-2"
+          >
+            <i class="fa-solid fa-print"></i> Cetak Laporan
+          </button>
+
+          <!-- Display Total Saldo -->
+          <div
+            class="bg-emerald-50 px-5 py-2.5 rounded-lg border border-emerald-200"
+          >
+            <span
+              class="text-[11px] text-emerald-600 font-semibold block uppercase tracking-wider"
+              >Total Saldo Kas Saat Ini</span
+            >
+            <span id="saldoKasText" class="text-2xl font-black text-emerald-700"
+              >Rp 0</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Grafik & Ringkasan -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Canvas Chart -->
+        <div
+          class="lg:col-span-2 bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4"
+        >
+          <h3 class="text-base font-bold text-gray-800 flex items-center gap-2">
+            <i class="fa-solid fa-chart-column text-emerald-600"></i>
+            Grafik Keuangan Bulanan
+          </h3>
+          <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
+            <canvas id="kasChart" class="max-h-72 w-full"></canvas>
+          </div>
+        </div>
+
+        <!-- Stat Summary Info -->
+        <div
+          class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between space-y-4"
+        >
+          <div>
+            <h3
+              class="text-base font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2"
+            >
+              Ringkasan Kas
+            </h3>
+            <div class="space-y-4">
+              <div
+                class="p-4 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center justify-between"
+              >
+                <div>
+                  <p class="text-xs text-emerald-600 font-medium">
+                    Total Pemasukan
+                  </p>
+                  <p
+                    id="totalMasukText"
+                    class="text-lg font-bold text-emerald-700 mt-0.5"
+                  >
+                    Rp 0
+                  </p>
+                </div>
+                <div class="p-3 bg-emerald-100 text-emerald-600 rounded-lg">
+                  <i class="fa-solid fa-arrow-down-left text-lg"></i>
+                </div>
+              </div>
+
+              <div
+                class="p-4 bg-red-50 rounded-xl border border-red-100 flex items-center justify-between"
+              >
+                <div>
+                  <p class="text-xs text-red-600 font-medium">
+                    Total Pengeluaran
+                  </p>
+                  <p
+                    id="totalKeluarText"
+                    class="text-lg font-bold text-red-700 mt-0.5"
+                  >
+                    Rp 0
+                  </p>
+                </div>
+                <div class="p-3 bg-red-100 text-red-600 rounded-lg">
+                  <i class="fa-solid fa-arrow-up-right text-lg"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg border border-blue-100 flex items-start gap-2"
+          >
+            <i class="fa-solid fa-circle-info mt-0.5 text-blue-500"></i>
+            <span
+              >Data kas di-update secara otomatis setelah pembayaran
+              terverifikasi oleh pengurus RT.</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabel Detail Transaksi Kas -->
+      <div
+        class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4"
+      >
+        <div
+          class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+        >
+          <h3 class="text-lg font-bold text-gray-800">
+            Riwayat Transaksi Terverifikasi
+          </h3>
+
+          <!-- Filter & Search Transaksi -->
+          <div class="flex flex-col sm:flex-row items-center gap-2">
+            <input
+              type="text"
+              id="searchKas"
+              oninput="filterKasData()"
+              placeholder="Cari transaksi..."
+              class="text-sm p-2 rounded-lg border border-gray-300 w-full sm:w-56 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+            />
+            <select
+              id="filterJenisKas"
+              onchange="filterKasData()"
+              class="text-sm p-2 rounded-lg border border-gray-300 bg-white w-full sm:w-auto focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+            >
+              <option value="">Semua Jenis</option>
+              <option value="masuk">Pemasukan (+)</option>
+              <option value="keluar">Pengeluaran (-)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table
+            class="w-full text-sm text-left text-gray-600 border border-gray-200 rounded-lg"
+          >
+            <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
+              <tr>
+                <th class="px-4 py-3">Tanggal</th>
+                <th class="px-4 py-3">Keterangan</th>
+                <th class="px-4 py-3">Kategori</th>
+                <th class="px-4 py-3">Status</th>
+                <th class="px-4 py-3 text-right">Jumlah</th>
+              </tr>
+            </thead>
+            <tbody id="tabelKasFullBody" class="divide-y divide-gray-200">
+              <tr>
+                <td colspan="5" class="text-center py-6 text-gray-400">
+                  <i
+                    class="fa-solid fa-spinner fa-spin mr-2 text-emerald-600"
+                  ></i
+                  >Memuat transaksi kas...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <!-- MODAL PEMBAYARAN KAS SEMI-OTOMATIS (TABBED) -->
+    <div
+      id="modalBayarKas"
+      class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto"
+      >
+        <button
+          onclick="closeModalBayar()"
+          class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-lg font-bold"
+        >
+          &times;
+        </button>
+
+        <div class="text-center space-y-1 border-b border-gray-100 pb-3">
+          <div
+            class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold mb-2"
+          >
+            <i class="fa-solid fa-receipt"></i>
+          </div>
+          <h3 class="text-lg font-bold text-gray-800">
+            Pembayaran & Konfirmasi Kas
+          </h3>
+          <p class="text-xs text-gray-500">
+            Scan QRIS / Transfer lalu kirimkan konfirmasi pembayaran
+          </p>
+        </div>
+
+        <!-- Navigation Tab -->
+        <div class="flex border-b border-gray-200 text-xs font-semibold">
+          <button
+            id="btnTab1"
+            onclick="switchTab('qris')"
+            class="flex-1 py-2 text-center text-emerald-600 border-b-2 border-emerald-600 transition"
+          >
+            1. Metode Bayar
+          </button>
+          <button
+            id="btnTab2"
+            onclick="switchTab('konfirmasi')"
+            class="flex-1 py-2 text-center text-gray-400 hover:text-gray-600 transition"
+          >
+            2. Konfirmasi Pembayaran
+          </button>
+        </div>
+
+        <!-- TAB 1: METODE BAYAR (QRIS / BANK) -->
+        <div id="tabQris" class="space-y-4">
+          <div
+            class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-center space-y-2"
+          >
+            <span
+              class="text-xs font-semibold text-gray-600 uppercase tracking-wider block"
+              >QRIS Pembayaran RT</span
+            >
+            <div
+              class="bg-white p-3 rounded-lg border border-gray-200 inline-block shadow-sm"
+            >
+              <img
+                src="https://via.placeholder.com/200x200?text=QRIS+KAS+RT"
+                alt="QRIS Kas RT"
+                class="w-40 h-40 object-contain mx-auto"
+              />
+            </div>
+            <p class="text-[11px] text-gray-400">
+              Mendukung GoPay, OVO, Dana, ShopeePay, & Mobile Banking
+            </p>
+          </div>
+
+          <div
+            class="p-3.5 bg-emerald-50 rounded-xl border border-emerald-100 text-xs space-y-2"
+          >
+            <div class="flex justify-between items-center">
+              <span class="text-emerald-800 font-semibold">Bank BCA:</span>
+              <span class="font-mono font-bold text-emerald-900"
+                >123-456-7890</span
+              >
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-emerald-800 font-semibold">Atas Nama:</span>
+              <span class="font-bold text-emerald-900">Kas RT 014 RW 008</span>
+            </div>
+          </div>
+
+          <button
+            onclick="switchTab('konfirmasi')"
+            class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg text-xs transition flex items-center justify-center gap-2"
+          >
+            Sudah Transfer? Konfirmasi Sekarang
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+
+        <!-- TAB 2: FORM KONFIRMASI (SEMI-OTOMATIS) -->
+        <form
+          id="formKonfirmasiKas"
+          onsubmit="handleKonfirmasi(event)"
+          class="hidden space-y-3 text-xs"
+        >
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1"
+              >Nama Lengkap / Kepala Keluarga *</label
+            >
+            <input
+              type="text"
+              id="bayarNama"
+              required
+              placeholder="Contoh: Ahmad Dinata"
+              class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+            />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-gray-700 mb-1"
+                >No. Rumah / Blok *</label
+              >
+              <input
+                type="text"
+                id="bayarBlok"
+                required
+                placeholder="Contoh: B3 / No. 12"
+                class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label class="block font-semibold text-gray-700 mb-1"
+                >Kategori Iuran *</label
+              >
+              <select
+                id="bayarKategori"
+                required
+                class="w-full p-2.5 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+              >
+                <option value="Iuran Bulanan">Iuran Bulanan</option>
+                <option value="Iuran Kebersihan">Iuran Kebersihan</option>
+                <option value="Iuran Keamanan">Iuran Keamanan</option>
+                <option value="Sumbangan / PHBI">Sumbangan / PHBI</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1"
+              >Nominal Transfer (Rp) *</label
+            >
+            <input
+              type="number"
+              id="bayarJumlah"
+              required
+              min="1000"
+              placeholder="Contoh: 50000"
+              class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1"
+              >Upload Bukti Transfer *</label
+            >
+            <input
+              type="file"
+              id="bayarBukti"
+              accept="image/*"
+              required
+              class="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-100 file:text-emerald-700 hover:file:bg-emerald-200 border border-gray-300 rounded-lg p-1"
+            />
+          </div>
+
+          <div class="pt-2 flex gap-2">
+            <button
+              type="button"
+              onclick="switchTab('qris')"
+              class="w-1/3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2.5 rounded-lg transition"
+            >
+              Kembali
+            </button>
+            <button
+              type="submit"
+              id="btnSubmitKonfirmasi"
+              class="w-2/3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2"
+            >
+              Kirim Konfirmasi
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer
+      class="bg-gray-800 text-white text-center py-4 text-xs border-t border-gray-700 mt-auto"
+    >
+      &copy; Portal Sistem Informasi RT 014 / RW 008. All rights reserved.
+    </footer>
+
+    <!-- JavaScript LOGIC -->
+    <script>
+      let rawKasData = [];
+      let kasChart = null;
+
+      function formatRupiah(number) {
+        return new Intl.NumberFormat("id-ID", {
+          style: "currency",
+          currency: "IDR",
+          maximumFractionDigits: 0,
+        }).format(number);
+      }
+
+      function formatTgl(str) {
+        if (!str) return "-";
+        return new Date(str).toLocaleDateString("id-ID", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      // Logic Modal & Switch Tab
+      function openModalBayar() {
+        document.getElementById("modalBayarKas").classList.remove("hidden");
+        switchTab("qris");
+      }
+
+      function closeModalBayar() {
+        document.getElementById("modalBayarKas").classList.add("hidden");
+      }
+
+      function switchTab(tab) {
+        const tabQris = document.getElementById("tabQris");
+        const formKonfirmasi = document.getElementById("formKonfirmasiKas");
+        const btnTab1 = document.getElementById("btnTab1");
+        const btnTab2 = document.getElementById("btnTab2");
+
+        if (tab === "qris") {
+          tabQris.classList.remove("hidden");
+          formKonfirmasi.classList.add("hidden");
+          btnTab1.className =
+            "flex-1 py-2 text-center text-emerald-600 border-b-2 border-emerald-600 font-bold transition";
+          btnTab2.className =
+            "flex-1 py-2 text-center text-gray-400 hover:text-gray-600 transition";
+        } else {
+          tabQris.classList.add("hidden");
+          formKonfirmasi.classList.remove("hidden");
+          btnTab2.className =
+            "flex-1 py-2 text-center text-emerald-600 border-b-2 border-emerald-600 font-bold transition";
+          btnTab1.className =
+            "flex-1 py-2 text-center text-gray-400 hover:text-gray-600 transition";
+        }
+      }
+
+      // Submit Konfirmasi Bayar (Semi-Otomatis)
+      async function handleKonfirmasi(e) {
+        e.preventDefault();
+        const btnSubmit = document.getElementById("btnSubmitKonfirmasi");
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengirim...`;
+
+        const formData = new FormData();
+        formData.append("nama", document.getElementById("bayarNama").value);
+        formData.append("blok", document.getElementById("bayarBlok").value);
+        formData.append(
+          "kategori",
+          document.getElementById("bayarKategori").value,
+        );
+        formData.append(
+          "nominal",
+          document.getElementById("bayarJumlah").value,
+        );
+        formData.append(
+          "bukti",
+          document.getElementById("bayarBukti").files[0],
+        );
+
+        try {
+          const res = await fetch("api_kas.php?action=konfirmasi", {
+            method: "POST",
+            body: formData,
+          });
+          const result = await res.json();
+
+          if (result.success) {
+            alert(
+              "Konfirmasi pembayaran berhasil dikirim! Pengurus RT akan memverifikasi pembayaran Anda.",
+            );
+            document.getElementById("formKonfirmasiKas").reset();
+            closeModalBayar();
+            loadKasPage();
+          } else {
+            alert(
+              "Gagal mengirim konfirmasi: " +
+                (result.message || "Terjadi kesalahan."),
+            );
+          }
+        } catch (err) {
+          alert("Terjadi kesalahan jaringan.");
+          console.error(err);
+        } finally {
+          btnSubmit.disabled = false;
+          btnSubmit.innerHTML = `Kirim Konfirmasi`;
+        }
+      }
+
+      async function loadKasPage() {
+        try {
+          const res = await fetch("api_kas.php?action=get");
+          const data = await res.json();
+
+          if (data.success) {
+            document.getElementById("saldoKasText").innerText = formatRupiah(
+              data.saldo,
+            );
+            rawKasData = data.transaksi || [];
+
+            let totalMasuk = 0;
+            let totalKeluar = 0;
+            rawKasData.forEach((t) => {
+              const st = (t.status || "").toLowerCase();
+              if (st === "valid" || st === "selesai") {
+                if (t.jenis === "masuk") totalMasuk += parseFloat(t.jumlah);
+                if (t.jenis === "keluar") totalKeluar += parseFloat(t.jumlah);
+              }
+            });
+
+            document.getElementById("totalMasukText").innerText =
+              formatRupiah(totalMasuk);
+            document.getElementById("totalKeluarText").innerText =
+              formatRupiah(totalKeluar);
+
+            renderTabelKas(rawKasData);
+
+            if (data.grafik) {
+              renderKasChart(data.grafik);
+            }
+          }
+        } catch (err) {
+          console.error("Gagal memuat data kas:", err);
+        }
+      }
+
+      function renderTabelKas(list) {
+        const tbody = document.getElementById("tabelKasFullBody");
+        tbody.innerHTML = "";
+
+        // Filter: Hanya tampilkan transaksi yang statusnya Valid atau Selesai
+        const listValid = list.filter((item) => {
+          const st = (item.status || "").toLowerCase();
+          return st === "valid" || st === "selesai";
+        });
+
+        if (listValid.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-400">Tidak ada riwayat transaksi kas yang selesai.</td></tr>`;
+          return;
+        }
+
+        listValid.forEach((item) => {
+          const isMasuk = item.jenis.toLowerCase() === "masuk";
+          const sign = isMasuk ? "+ " : "- ";
+          const colorClass = isMasuk ? "text-emerald-600" : "text-red-600";
+          const badgeClass = isMasuk
+            ? "bg-emerald-100 text-emerald-700"
+            : "bg-blue-100 text-blue-700";
+
+          let statusBadge = `<span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-medium">Valid</span>`;
+          if (item.status && item.status.toLowerCase() === "selesai") {
+            statusBadge = `<span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-medium">Selesai</span>`;
+          }
+
+          let keteranganBersih = item.keterangan || "";
+          if (keteranganBersih.includes("| Bukti:")) {
+            keteranganBersih = keteranganBersih.split("| Bukti:")[0].trim();
+          }
+
+          const tr = document.createElement("tr");
+          tr.className = "hover:bg-gray-50 transition";
+          tr.innerHTML = `
+            <td class="px-4 py-3 whitespace-nowrap text-xs">${formatTgl(item.tanggal)}</td>
+            <td class="px-4 py-3 font-medium text-gray-800">${keteranganBersih}</td>
+            <td class="px-4 py-3">
+              <span class="${badgeClass} text-xs px-2.5 py-1 rounded-full font-medium">${item.kategori}</span>
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap">
+              ${statusBadge}
+            </td>
+            <td class="px-4 py-3 text-right ${colorClass} font-bold whitespace-nowrap">
+              ${sign}${formatRupiah(item.jumlah)}
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      function filterKasData() {
+        const keyword = document
+          .getElementById("searchKas")
+          .value.toLowerCase();
+        const jenis = document.getElementById("filterJenisKas").value;
+
+        const filtered = rawKasData.filter((item) => {
+          const st = (item.status || "").toLowerCase();
+          if (st !== "valid" && st !== "selesai") return false;
+
+          const matchKeyword =
+            item.keterangan.toLowerCase().includes(keyword) ||
+            item.kategori.toLowerCase().includes(keyword);
+
+          const matchJenis = jenis === "" || item.jenis.toLowerCase() === jenis;
+
+          return matchKeyword && matchJenis;
+        });
+
+        renderTabelKas(filtered);
+      }
+
+      function renderKasChart(grafikData) {
+        const labels = grafikData.map((g) => g.bulan);
+        const dataMasuk = grafikData.map((g) => g.masuk);
+        const dataKeluar = grafikData.map((g) => g.keluar);
+
+        const ctx = document.getElementById("kasChart").getContext("2d");
+
+        if (kasChart) {
+          kasChart.destroy();
+        }
+
+        kasChart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Pemasukan (Rp)",
+                data: dataMasuk,
+                backgroundColor: "#10b981",
+                borderRadius: 6,
+              },
+              {
+                label: "Pengeluaran (Rp)",
+                data: dataKeluar,
+                backgroundColor: "#ef4444",
+                borderRadius: 6,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { position: "top" } },
+            scales: { y: { beginAtZero: true } },
+          },
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        loadKasPage();
+        setInterval(loadKasPage, 10000);
+      });
+    </script>
+  </body>
+</html>
